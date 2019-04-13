@@ -25,11 +25,21 @@ export default new Router({
         {
           path: '/user',
           component: () => import('@/pages/user'),
-        }, {
-          path: '/busLine',
-          component: () => import('@/pages/busLine'),
+        }, 
+        {
+          path: '/search',
+          component: () => import('@/pages/search'),
+        },
+        {
+          path: '/busline',
+          component: () => import('@/pages/busline'),
+        },
+        {
+          path: '/updateInfo',
+          component: () => import('@/pages/updateInfo'),
         },
       ]
-    }
+    },
+    
   ]
 })

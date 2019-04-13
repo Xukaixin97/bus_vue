@@ -15,14 +15,14 @@
               <i class="el-icon-document"></i>数据管理
             </template>
             <el-menu-item index="/user">用户列表</el-menu-item>
-            <el-menu-item index="/busline">公交线路列表</el-menu-item>
+            <el-menu-item index="/busLine">公交线路列表</el-menu-item>
           </el-submenu>
           <el-submenu   index="3">
             <template slot="title">
               <i class="el-icon-plus"></i>添加数据
             </template>
-            <el-menu-item index="/">添加线路</el-menu-item>
-            <el-menu-item index="/">添加商品</el-menu-item>
+            <el-menu-item index="/search">添加线路</el-menu-item>
+            <el-menu-item index="/updateInfo">添加商品</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>

@@ -14,10 +14,10 @@
           label-position="left"
         >
           <el-form-item prop="username">
-            <el-input placeholder="请输入账号" name="username" type="text" v-model="ruleForm.username"/>
+            <el-input placeholder="请输入账号" name="username" type="text" v-model="ruleForm.username" auto-complete="on"/>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="ruleForm.password" placeholder="请输入密码" name="password"></el-input>
+            <el-input v-model="ruleForm.password" placeholder="请输入密码" name="password" type="password"></el-input>
           </el-form-item>
           <el-form-item>
             <span style="font-size:14px;padding-bottom: 100px;">账号可以是你的电子邮件地址或手机号码。</span>
@@ -63,7 +63,7 @@ export default {
         var params = new URLSearchParams();
         params.append("username", value);
         axios
-          .post("/api/user/checkUsernameIfExit", params)
+          .post("/api/admin/checkUsernameIfExit", params)
           .then(function(response) {
             var result = response.data;
             // console.log(result)
@@ -103,15 +103,13 @@ export default {
           params.append("username", this.ruleForm.username);
           params.append("password", this.ruleForm.password);
           axios
-            .post("/api/user/login", params)
+            .post("/api/admin/login", params)
             .then(function(response) {
               console.log(response.data);
               if (true == response.data) {
-                that.$router.push("/manage");
-                
+                that.$router.push("/busLine");
               } else {
                 that.$message.error('用户名与密码不匹配')
-            
               }
             })
             .catch(error => console.log("a"));

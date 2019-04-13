@@ -7,7 +7,6 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 // import './assets/iconfont.css'
 import './assets/animate.css'
-
 import store from './store/store.js';
 
 Vue.use(ElementUI);

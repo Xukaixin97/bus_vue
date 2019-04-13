@@ -86,17 +86,16 @@ export default {
         callback();
       }
     };
-    var validateCode = (rule,value,callback)=>{
-      if(value===""){
-        callback(new Error("请输入验证码"))
-      }else if(value!=this.ruleForm.code2){
-        console.log(value+","+this.ruleForm.code2)
-        
-        callback(new Error("验证码错误，请重新输入"))
-      }else {
+    var validateCode = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入验证码"));
+      } else if (value != this.ruleForm.code2) {
+        console.log(value + "," + this.ruleForm.code2);
+        callback(new Error("验证码错误，请重新输入"));
+      } else {
         callback();
       }
-    }
+    };
     return {
       statusMsg: "",
       ruleForm: {
@@ -105,7 +104,7 @@ export default {
         password2: "",
         email: "",
         code: "",
-        code2:""
+        code2: ""
       },
       rules: {
         username: [
@@ -127,11 +126,12 @@ export default {
           }
         ],
 
-        code: [
-          {
-            validator: validateCode, trigger: "blur"
-          }
-        ]
+        // code: [
+        //   {
+        //     validator: validateCode,
+        //     trigger: "blur"
+        //   }
+        // ]
       }
     };
   },
@@ -142,7 +142,19 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          alert("submit!");
+          console.log(this.ruleForm);
+          axios
+            .post("/api/admin/regist", this.ruleForm)
+            .then(function(response) {
+              var result = response.data;
+              // console.log(result)
+              if (result == false) {
+                callback(new Error("用户不存在"));
+              } else {
+                callback();
+              }
+            })
+            .catch(error => console.log(error));
         } else {
           console.log("error submit!!");
           return false;
@@ -156,26 +168,10 @@ export default {
       axios
         .post("/api/user/sendMsg", params)
         .then(response => {
-          this.ruleForm.code2 = response.data;
-          console.log(this.ruleForm.code2);
+          this.ruleForm.code2 = response.data; //返回的验证码
+          // console.log(this.ruleForm.code2);
         })
         .catch(error => console.log("error"));
-    },
-    login(e) {
-      if (checkForm(e)) {
-        console.log(this.password + "," + this.username);
-        axios
-          .get("/api/user/login", {
-            login_username: this.username,
-            login_password: this.password
-          })
-          .then(function(response) {
-            console.log(response.data);
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
-      }
     }
   }
 };
