@@ -166,7 +166,7 @@ export default {
       params.append("email", this.ruleForm.email);
       console.log(this.ruleForm.email);
       axios
-        .post("/api/user/sendMsg", params)
+        .post("/api/admin/sendMsg", params)
         .then(response => {
           this.ruleForm.code2 = response.data; //返回的验证码
           // console.log(this.ruleForm.code2);

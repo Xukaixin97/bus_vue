@@ -9,6 +9,11 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/',
+      component: () => import('@/pages/login'),
+      hidden: true,
+    },
+    {
       path: '/login',
       component: () => import('@/pages/login'),
       hidden: true,
@@ -34,10 +39,7 @@ export default new Router({
           path: '/busline',
           component: () => import('@/pages/busline'),
         },
-        {
-          path: '/updateInfo',
-          component: () => import('@/pages/updateInfo'),
-        },
+       
       ]
     },
     

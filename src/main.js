@@ -9,6 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './assets/animate.css'
 import store from './store/store.js';
 
+
 Vue.use(ElementUI);
 
 Vue.config.productionTip = false

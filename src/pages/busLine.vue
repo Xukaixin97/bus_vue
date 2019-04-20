@@ -1,10 +1,35 @@
 <template>
   <div>
-    <span>查询用户</span>
-    <el-input placeholder="请输入内容" v-model="input10" clearable style="margin-bottom:30px;width:30%;"></el-input>
+    <span>查询线路</span>
+    <el-cascader
+      clearable
+      expand-trigger="hover"
+      :options="options"
+      @change="handleChange"
+      style="width:200px;"
+      placeholder="请选择城市"
+      :show-all-levels="false"
+    ></el-cascader>
+    <el-select v-model="busType" multiple style="width:220px;" placeholder="请选择公交类型">
+      <el-option
+        v-for="item in typeOptions"
+        :key="item.value"
+        :label="item.label"
+        :value="item.value"
+      ></el-option>
+    </el-select>
+    <el-input
+      placeholder="请输入公交关键词"
+      v-model="busKeyWords"
+      clearable
+      style="margin-bottom:30px;width:220px;"
+    ></el-input>
+
+    <el-button type="success" @click="searchByKeyWords">搜索</el-button>
     <div>
-      <el-table :data="list" style="width:100%" height="620" @expand-change="expandChange">
+      <el-table :data="list" style="width:100%" height="600" @expand-change="expandChange">
         <!-- <el-table-column type="selection" align="left" width="40px"></el-table-column> -->
+
         <el-table-column align="center" label="#" width="50px">
           <template slot-scope="scope">
             <span>{{ scope.$index+1 }}</span>
@@ -66,6 +91,17 @@
           </template>
         </el-table-column>
       </el-table>
+      <div class="block" style="width:100%">
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[10, 50, 100, 200]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="totalPage"
+        ></el-pagination>
+      </div>
     </div>
 
     <el-dialog title="修改收货地址" :visible.sync="dialogFormVisible" width="700px">
@@ -131,36 +167,131 @@
 
 <script>
 import axios from "axios";
-import { error } from 'util';
+import { error } from "util";
+
 export default {
   name: "User",
   data() {
     return {
+      options: [],
+      typeOptions: [
+        {
+          value: "地铁",
+          label: "地铁"
+        },
+        {
+          value: "普通公交",
+          label: "普通公交"
+        }
+      ],
+      city: "",
+      busType: "",
       color: "#99a9bf",
-      input10: "",
+      busKeyWords: "",
       show: false,
       list: [],
       selectedInfo: [],
       stationInfo: [],
       dialogFormVisible: false,
-      formLabelWidth: "100px"
+      formLabelWidth: "100px",
+      currentPage: 1,
+      pageSize: 10,
+      totalPage: 200
     };
   },
   created() {
     this.getList();
+    this.getCounts();
+    this.getCity();
   },
   methods: {
-    getList() {
+    searchByKeyWords() {
+      // console.log(this.city + "," + this.busKeyWords + "," + this.busType);
+     
+      this.getList();
+    },
+    handleSizeChange(val) {
+      this.pageSize = val;
+      console.log(this.pageSize);
+      // console.log(`每页 ${val} 条`);
+      this.getList();
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      console.log(`当前页: ${val}`);
+      this.getList();
+    },
+    handleChange(value) {
+      if(value.length>0){
+        console.log(value)
+      this.city = value[1];
+      }else{
+        this.city=""
+      }
+      
+    },
+    getCity() {
+      var that = this;
+      AMap.plugin("AMap.DistrictSearch", function() {
+        var districtSearch = new AMap.DistrictSearch({
+          // 关键字对应的行政区级别，country表示国家
+          level: "country",
+          //  显示下级行政区级数，1表示返回下一级行政区
+          subdistrict: 2
+        });
+
+        // 搜索所有省/直辖市信息
+        districtSearch.search("中国", function(status, result) {
+          // 查询成功时，result即为对应的行政区信息
+          // console.log(result.districtList[0].districtList);
+          // console.log(result.districtList[0].districtList.length);
+          // var length = result.districtList[0].districtList.length;
+          // that.options.forEach((item, index) => {
+          let cityData = JSON.stringify(result.districtList[0].districtList);
+          var options = JSON.parse(
+            cityData.replace(/citycode/g, "value").replace(/name/g, "label")
+          );
+          // });
+          options.map((item, index) => {
+            item.children = item.districtList;
+            options.push(item);
+          });
+          that.options = options;
+          console.log(options);
+        });
+      });
+    },
+    getCounts() {
       var that = this;
       axios
-        .get("/api/bus/getLineInfo")
+        .get("/api/bus/getCounts")
+        .then(function(response) {
+          console.log("1");
+          // console.log(response.data)
+          var j = parseInt(response.data);
+          that.totalPage = j;
+          // console.log(that.stationInfoTotal[0].names);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    getList() {
+      var that = this;
+      var params = new URLSearchParams();
+      params.append("pageSize", this.pageSize);
+      params.append("currentPage", this.currentPage);
+      params.append("city", this.city);
+      params.append("busType", this.busType);
+      params.append("busKeyWords", this.busKeyWords);
+      axios
+        .post("/api/bus/getLineInfo", params)
         .then(function(response) {
           // console.log(response.data);
           that.list = response.data;
           var str;
           for (var i in response.data) {
             str = response.data[i].viastops.split(","); //将线路字符串转化为数组
-
             for (var j in str) {
               // console.log(str[j])
               that.stationInfo.push({
@@ -189,16 +320,14 @@ export default {
       this.selectedInfo = e;
     },
     updateLineInfo() {
-      var that=this
+      var that = this;
       axios
         .post("/api/bus/updateLineInfo", this.selectedInfo)
-        .then(response =>
-          console.log(response.data),
-          that.dialogFormVisible=false,
+        .then(
+          response => console.log(response.data),
+          (that.dialogFormVisible = false)
         )
-        .catch( error =>
-          console.log(error)
-        );
+        .catch(error => console.log(error));
     },
     deleteUser(row) {
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {

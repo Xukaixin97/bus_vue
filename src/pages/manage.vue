@@ -22,7 +22,6 @@
               <i class="el-icon-plus"></i>添加数据
             </template>
             <el-menu-item index="/search">添加线路</el-menu-item>
-            <el-menu-item index="/updateInfo">添加商品</el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -34,13 +33,13 @@
             <el-breadcrumb separator="/">
               <el-breadcrumb-item :to="{ path: '/manage' }">首页</el-breadcrumb-item>
             </el-breadcrumb>
-            <el-dropdown>
+            <!-- <el-dropdown>
               <span class="el-dropdown-link">下拉菜单</span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="home">首页</el-dropdown-item>
                 <el-dropdown-item command="signout">退出</el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>
+            </el-dropdown> -->
           </template>
         </el-header>
         <el-main>
