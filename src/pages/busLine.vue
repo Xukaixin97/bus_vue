@@ -223,7 +223,7 @@ export default {
     },
     handleChange(value) {
       if(value.length>0){
-        console.log(value)
+        // console.log(value)
       this.city = value[1];
       }else{
         this.city=""
@@ -257,7 +257,7 @@ export default {
             options.push(item);
           });
           that.options = options;
-          console.log(options);
+          // console.log(options);
         });
       });
     },
@@ -266,7 +266,7 @@ export default {
       axios
         .get("/api/bus/getCounts")
         .then(function(response) {
-          console.log("1");
+          // console.log("1");
           // console.log(response.data)
           var j = parseInt(response.data);
           that.totalPage = j;

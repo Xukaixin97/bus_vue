@@ -16,7 +16,7 @@
         @province="onChangeProvince"
         @city="onChangeCity"
         style="margin-right:10px"
-      ></v-distpicker> -->
+      ></v-distpicker>-->
       <el-input
         v-model="input"
         placeholder="请输入关键词"
@@ -29,7 +29,13 @@
       <el-button type="primary" @click="batchAdd">批量添加</el-button>
     </div>
     <div>
-      <el-table :data="lineInfo" style="width:100%" height="500" ref="multipleTable" @expand-change="expandChange">
+      <el-table
+        :data="lineInfo"
+        style="width:100%"
+        height="500"
+        ref="multipleTable"
+        @expand-change="expandChange"
+      >
         <!-- <el-table-column type="selection" align="left" width="40px"></el-table-column> -->
         <el-table-column type="selection" width="40px"></el-table-column>
         <el-table-column align="center" label="#" width="40px">
@@ -82,9 +88,11 @@
 <script >
 import axios from "axios";
 import VDistpicker from "v-distpicker";
+import { error } from "util";
 export default {
   data() {
     return {
+      cityname: "",
       city: "",
       input: "",
       province: "",
@@ -96,15 +104,14 @@ export default {
   // components: { VDistpicker },
   created() {
     this.getCity();
-    
   },
   methods: {
-    batchAdd(){
-      console.log(this.$refs.multipleTable.selection)
+    batchAdd() {
+      console.log(this.$refs.multipleTable.selection);
       var params = this.$refs.multipleTable.selection;
       params.forEach(element => {
         // console.log(element)
-        this.addLineInfo(element)
+        this.addLineInfo(element);
       });
       // axios.post("/api/bus/batchAdd")
       // .then(res = {
@@ -113,9 +120,9 @@ export default {
       // .catch(error => console.log(error))
     },
     handleChange(value) {
-        console.log(value)
-       this.city = value[1];
-      },
+      console.log(value);
+      this.city = value[1];
+    },
     search() {
       var that = this;
       if (this.input == "") {
@@ -127,7 +134,7 @@ export default {
       }
 
       AMap.plugin(["AMap.LineSearch"], function() {
-        console.log(that.city);
+        // console.log(that.city);
         //实例化公交线路查询类
         var linesearch = new AMap.LineSearch({
           pageIndex: 1, //页码，默认值为1
@@ -138,7 +145,7 @@ export default {
         //执行公交路线关键字查询
         linesearch.search(that.input, function(status, result) {
           //打印状态信息status和结果信息result
-          // console.log(status, result);
+          console.log(status, result);
           if (result.lineInfo == null) {
             that.$message({
               message: "未查到数据",
@@ -188,16 +195,12 @@ export default {
               that.lineInfo[i].stime = "暂无";
             }
           }
-
+        });
       });
-      });
-
-
-     
     },
-    getCity(){
-      var that = this
-         AMap.plugin("AMap.DistrictSearch", function() {
+    getCity() {
+      var that = this;
+      AMap.plugin("AMap.DistrictSearch", function() {
         var districtSearch = new AMap.DistrictSearch({
           // 关键字对应的行政区级别，country表示国家
           level: "country",
@@ -219,10 +222,25 @@ export default {
           // });
           options.map((item, index) => {
             item.children = item.districtList;
-            options.push(item);
+            // options.push(item);
           });
           that.options = options;
-          // console.log(options);
+          // console.log(options)
+
+          // for (var i = 0; i < options.length; i++) {
+          //   var data = JSON.parse(JSON.stringify(options[i]));
+          //   data.districtList = JSON.stringify(data.districtList);
+          //   var params = new URLSearchParams();
+          //   params.append("adcode", data.adcode);
+          //   params.append("name", data.label);
+          //   params.append("level", data.level);
+          //   params.append("districtList", data.districtList);
+          //   axios
+          //   .post("/api/bus/addCityInfo", params)
+          //   .then(res => {})
+          //   .catch(error => console.log(error));
+          // }
+          
         });
       });
     },
@@ -249,7 +267,7 @@ export default {
             });
           } else {
             that.$message({
-              message: "添加失败,"+infos.name+"已经存在",
+              message: "添加失败," + infos.name + "已经存在",
               type: "warning"
             });
           }
