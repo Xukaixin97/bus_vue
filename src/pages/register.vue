@@ -77,6 +77,27 @@ import { error } from "util";
 export default {
   name: "Register",
   data() {
+    var validateUsernameIfExit = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入用户名"));
+      } else {
+        // console.log(value)
+        var params = new URLSearchParams();
+        params.append("username", value);
+        axios
+          .post("/api/admin/checkUsernameIfExit", params)
+          .then(function(response) {
+            var result = response.data;
+            // console.log(result)
+            if (result == true) {
+              callback(new Error("用户已存在,请重新命名"));
+            } else {
+              callback();
+            }
+          })
+          .catch(error => console.log(error));
+      }
+    };
     var validatePass2 = (rule, value, callback) => {
       if (value === "") {
         callback(new Error("请再次输入密码"));
@@ -109,7 +130,8 @@ export default {
       rules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 6, max: 18, message: "长度在 6 到 18个字符", trigger: "blur" }
+          { min: 6, max: 18, message: "长度在 6 到 18个字符", trigger: "blur" },
+          { validator: validateUsernameIfExit, trigger: "blur" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
@@ -125,13 +147,12 @@ export default {
             trigger: ["blur", "change"]
           }
         ],
-
-        // code: [
-        //   {
-        //     validator: validateCode,
-        //     trigger: "blur"
-        //   }
-        // ]
+        code: [
+          {
+            validator: validateCode,
+            trigger: "blur"
+          }
+        ]
       }
     };
   },
@@ -140,6 +161,7 @@ export default {
       this.$router.push("/login");
     },
     submitForm(formName) {
+      var that = this
       this.$refs[formName].validate(valid => {
         if (valid) {
           console.log(this.ruleForm);
@@ -148,10 +170,18 @@ export default {
             .then(function(response) {
               var result = response.data;
               // console.log(result)
-              if (result == false) {
-                callback(new Error("用户不存在"));
+              if (result == true) {
+                that.$message({
+                  message:'注册成功',
+                  type:'success',
+                  duration:'1000'
+                })
+                that.$router.push({path:'/search'})
               } else {
-                callback();
+                that.$message({
+                  message:'注册失败',
+                  type:'error',
+                })
               }
             })
             .catch(error => console.log(error));
@@ -170,6 +200,10 @@ export default {
         .then(response => {
           this.ruleForm.code2 = response.data; //返回的验证码
           // console.log(this.ruleForm.code2);
+          this.$message({
+            message: "验证码发送成功",
+            type: "success"
+          });
         })
         .catch(error => console.log("error"));
     }

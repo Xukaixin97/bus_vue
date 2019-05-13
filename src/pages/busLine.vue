@@ -31,13 +31,13 @@
         <!-- <el-table-column type="selection" align="left" width="40px"></el-table-column> -->
 
         <el-table-column align="center" label="#" width="50px">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <span>{{ scope.$index+1 }}</span>
           </template>
         </el-table-column>
 
         <el-table-column type="expand" width="80px">
-          <template slot-scope="props">
+          <template v-slot="props">
             <el-scrollbar>
               <el-form
                 label-position="left"
@@ -85,9 +85,9 @@
         <el-table-column label="公交名称" prop="name" align="center" width="400px"></el-table-column>
         <el-table-column label="公交类型" prop="type" align="center"></el-table-column>
         <el-table-column label="操作" align="center" width="200px">
-          <template slot-scope="scope">
+          <template v-slot="scope">
             <el-button type="primary" icon="el-icon-edit" circle @click="updateInfoForm(scope.row)"></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle @click="dialogFormVisible = true"></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle @click="deleteInfo(scope.row)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <el-dialog title="修改收货地址" :visible.sync="dialogFormVisible" width="700px">
+    <el-dialog title="修改公交信息" :visible.sync="dialogFormVisible" width="700px">
       <el-form :model="selectedInfo" style="padding-right:10px">
         <el-row>
           <el-col :span="12">
@@ -167,7 +167,8 @@
 
 <script>
 import axios from "axios";
-import { error } from "util";
+// import { error } from "util";
+
 
 export default {
   name: "User",
@@ -200,14 +201,14 @@ export default {
     };
   },
   created() {
-    this.getList();
-    this.getCounts();
+    this.getList(); 
+    // this.getCounts();
     this.getCity();
   },
   methods: {
     searchByKeyWords() {
       // console.log(this.city + "," + this.busKeyWords + "," + this.busType);
-     
+
       this.getList();
     },
     handleSizeChange(val) {
@@ -222,13 +223,12 @@ export default {
       this.getList();
     },
     handleChange(value) {
-      if(value.length>0){
+      if (value.length > 0) {
         // console.log(value)
-      this.city = value[1];
-      }else{
-        this.city=""
+        this.city = value[1];
+      } else {
+        this.city = "";
       }
-      
     },
     getCity() {
       var that = this;
@@ -239,7 +239,6 @@ export default {
           //  显示下级行政区级数，1表示返回下一级行政区
           subdistrict: 2
         });
-
         // 搜索所有省/直辖市信息
         districtSearch.search("中国", function(status, result) {
           // 查询成功时，result即为对应的行政区信息
@@ -261,21 +260,7 @@ export default {
         });
       });
     },
-    getCounts() {
-      var that = this;
-      axios
-        .get("/api/bus/getCounts")
-        .then(function(response) {
-          // console.log("1");
-          // console.log(response.data)
-          var j = parseInt(response.data);
-          that.totalPage = j;
-          // console.log(that.stationInfoTotal[0].names);
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    },
+    
     getList() {
       var that = this;
       var params = new URLSearchParams();
@@ -287,11 +272,13 @@ export default {
       axios
         .post("/api/bus/getLineInfo", params)
         .then(function(response) {
-          // console.log(response.data);
-          that.list = response.data;
+          console.log(response.data);
+          var list = response.data.list
+          that.list = response.data.list;
+          that.totalPage = response.data.total;
           var str;
-          for (var i in response.data) {
-            str = response.data[i].viastops.split(","); //将线路字符串转化为数组
+          for (var i in list) {
+            str = list[i].viastops.split(","); //将线路字符串转化为数组
             for (var j in str) {
               // console.log(str[j])
               that.stationInfo.push({
@@ -302,6 +289,7 @@ export default {
             //洗增数组格式的station信息到list
             that.list[i].stationInfo = that.stationInfo;
             that.stationInfo = [];
+
           }
           // console.log(that.stationInfoTotal[0].names);
         })
@@ -323,14 +311,18 @@ export default {
       var that = this;
       axios
         .post("/api/bus/updateLineInfo", this.selectedInfo)
-        .then(
-          response => console.log(response.data),
-          (that.dialogFormVisible = false)
-        )
+        .then(response => {
+          console.log(response.data), (that.dialogFormVisible = false);
+          this.$message({
+            message: "修改信息成功",
+            type: "success"
+          });
+        })
         .catch(error => console.log(error));
     },
-    deleteUser(row) {
-      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+    
+    deleteInfo(row) {
+      this.$confirm("此操作将永久删除该条信息, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
@@ -341,17 +333,17 @@ export default {
           var params = new URLSearchParams();
           params.append("id", id);
           axios
-            .post("/api/user/deleteUser", params)
+            .post("/api/bus/deleteInfo", params)
             .then(function(response) {
               var result = response.data;
-
+              console.log(result)
               if (result) {
                 that.getList();
               }
             })
             .catch(function(error) {
               this.$error({
-                type: "info",
+                type: "error",
                 message: "删除失败"
               });
             });
@@ -371,7 +363,7 @@ export default {
 };
 </script>
 
-<style >
+<style scoped>
 #container {
   display: flex;
 }
@@ -390,8 +382,10 @@ export default {
 span {
   font-size: 15px;
 }
-.el-input__inner {
-  height: 40px;
-}
+
+</style>
+
+<style>
+ 
 </style>
 

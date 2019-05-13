@@ -14,10 +14,22 @@
           label-position="left"
         >
           <el-form-item prop="username">
-            <el-input placeholder="请输入账号" name="username" type="text" v-model="ruleForm.username" auto-complete="on"/>
+            <el-input class="modinput"
+              placeholder="请输入账号"
+              name="username"
+              type="text"
+              v-model="ruleForm.username"
+              auto-complete="on"
+            />
           </el-form-item>
           <el-form-item prop="password">
-            <el-input v-model="ruleForm.password" placeholder="请输入密码" name="password" type="password"></el-input>
+            <el-input
+              class="modinput"
+              v-model="ruleForm.password"
+              placeholder="请输入密码"
+              name="password"
+              type="password"
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <span style="font-size:14px;padding-bottom: 100px;">账号可以是你的电子邮件地址或手机号码。</span>
@@ -99,20 +111,24 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           var that = this;
-          var params = new URLSearchParams();
-          params.append("username", this.ruleForm.username);
-          params.append("password", this.ruleForm.password);
+          var param = new URLSearchParams();
+          param.append("username", this.ruleForm.username);
+          param.append("password", this.ruleForm.password);
           axios
-            .post("/api/admin/login", params)
+            .post("/api/admin/login", param)
             .then(function(response) {
-              console.log(response.data);
-              if (true == response.data) {
-                that.$router.push("/busLine");
+              console.log(response.data)
+              if (response.data) {
+                localStorage.setItem("token", "token123");
+                localStorage.setItem("username",response.data.username)
+                that.$router.push({
+                  path: "/index",
+                });
               } else {
-                that.$message.error('用户名与密码不匹配')
+                that.$message.error("用户名与密码不匹配");
               }
             })
-            .catch(error => console.log("a"));
+            .catch(error => console.log(error));
         } else {
           console.log("error submit!!");
           return false;
@@ -139,13 +155,15 @@ export default {
   width: 408.33px;
   font-size: 16px;
 }
+
 </style>
 
 <style >
-.el-input__inner {
+.modinput .el-input__inner{
   height: 56.09px;
 }
 .el-button--text {
   padding: 0;
 }
 </style>
+

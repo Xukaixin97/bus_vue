@@ -32,7 +32,7 @@
       <el-table
         :data="lineInfo"
         style="width:100%"
-        height="500"
+        height="580"
         ref="multipleTable"
         @expand-change="expandChange"
       >
@@ -107,7 +107,7 @@ export default {
   },
   methods: {
     batchAdd() {
-      console.log(this.$refs.multipleTable.selection);
+      // console.log(this.$refs.multipleTable.selection);
       var params = this.$refs.multipleTable.selection;
       params.forEach(element => {
         // console.log(element)
@@ -120,7 +120,7 @@ export default {
       // .catch(error => console.log(error))
     },
     handleChange(value) {
-      console.log(value);
+      // console.log(value);
       this.city = value[1];
     },
     search() {
@@ -251,7 +251,7 @@ export default {
     },
 
     addLineInfo(e) {
-      console.log(e);
+      // console.log(e);
       var that = this;
       var infos = JSON.parse(JSON.stringify(e));
       // console.log(JSON.stringify(this.lineInfo[0]))
@@ -259,7 +259,7 @@ export default {
       axios
         .post("/api/bus/addLineInfo", infos, {})
         .then(function(response) {
-          console.log(response.data);
+          // console.log(response.data);
           if (response.data == true) {
             that.$message({
               message: "添加成功",
@@ -279,7 +279,7 @@ export default {
   }
 };
 </script>
-<style lang="">
+<style scoped>
 #container {
   display: flex;
 }
@@ -295,4 +295,11 @@ export default {
   margin-bottom: 0;
   width: 50%;
 }
+.el-input__inner {
+  height: 40px;
+}
+
+</style>
+<style >
+
 </style>

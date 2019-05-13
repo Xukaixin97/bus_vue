@@ -9,15 +9,15 @@
           background-color="rgb(38,48,69)"
           text-color="#fff"
         >
-          <el-menu-item index="manage" style="text-align:center;font-size:20px">后台管理系统</el-menu-item>
-          <el-submenu  index="2">
+          <el-menu-item index="index" style="text-align:center;font-size:20px">后台管理系统</el-menu-item>
+          <el-submenu index="2">
             <template slot="title">
               <i class="el-icon-document"></i>数据管理
             </template>
             <el-menu-item index="/user">用户列表</el-menu-item>
             <el-menu-item index="/busLine">公交线路列表</el-menu-item>
           </el-submenu>
-          <el-submenu   index="3">
+          <el-submenu index="3">
             <template slot="title">
               <i class="el-icon-plus"></i>添加数据
             </template>
@@ -30,16 +30,16 @@
         <!-- header头 -->
         <el-header height="70px">
           <template class="header_container">
-            <el-breadcrumb separator="/">
+            <!-- <el-breadcrumb separator="/">
               <el-breadcrumb-item :to="{ path: '/manage' }">首页</el-breadcrumb-item>
-            </el-breadcrumb>
-            <!-- <el-dropdown>
-              <span class="el-dropdown-link">下拉菜单</span>
+            </el-breadcrumb>-->
+            <el-dropdown>
+              <span class="el-dropdown-link" style="font-size:16px">{{username}}</span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="home">首页</el-dropdown-item>
-                <el-dropdown-item command="signout">退出</el-dropdown-item>
+                <!-- <el-dropdown-item command="home">首页</el-dropdown-item> -->
+                <el-dropdown-item command="signout" @click.native="exit">退出</el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown> -->
+            </el-dropdown>
           </template>
         </el-header>
         <el-main>
@@ -53,10 +53,30 @@
 </template>
 
 <script>
-export default {};
+export default {
+  data() {
+    return {
+      username: "123"
+    };
+  },
+  created() {
+    
+      this.username = localStorage.getItem("username");
+    
+  },
+  methods: {
+    exit() {
+      var that = this
+      console.log("消除token");
+      localStorage.setItem("token","");
+       localStorage.setItem("username","")
+      that.$router.push("/login");
+    }
+  }
+};
 </script>
 
-<style lang="scss"  scoped>
+<style >
 .el-header {
   background-color: rgb(239, 242, 247);
   color: rgb(0, 0, 0);
@@ -66,7 +86,6 @@ export default {};
   justify-content: space-between;
   align-items: center;
   padding-left: 80px;
-  
 }
 
 .el-aside {
@@ -84,14 +103,13 @@ export default {};
 }
 .el-menu {
   width: 270px;
-  
 }
 .el-menu-item.is-active {
   background-color: rgb(23, 33, 46) !important;
 }
 .el-menu-item:hover {
   background-color: rgb(23, 33, 46) !important;
-  color: #409EFF !important;
+  color: #409eff !important;
 }
 
 .el-icon-plus {
@@ -100,20 +118,28 @@ export default {};
 .el-dropdown {
   display: inline-block;
   position: absolute;
-  right: 40px;
+  right: 80px;
   color: #000000;
   font-size: 20px;
 }
+
 </style>
 
 
 <style >
-  .el-submenu__title:focus, .el-submenu__title:hover{
-    outline: 0 !important;
-    color: #409EFF !important;
-    background: none !important;
+.el-submenu__title:focus,
+.el-submenu__title:hover {
+  outline: 0 !important;
+  color: #409eff !important;
+  background: none !important;
 }
-.el-menu-vertical-demo:hover{
+.el-menu-vertical-demo:hover {
   background-color: rgb(23, 33, 46) !important;
+}
+</style>
+
+<style >
+  .el-input__inner {
+  height: 40px;
 }
 </style>

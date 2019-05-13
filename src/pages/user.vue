@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <span>查询用户</span>
-    <el-input placeholder="请输入用户名关键词" v-model="nameKeyWord" clearable style="margin-bottom:30px;width:200px;"></el-input>
-    <el-input placeholder="请输入手机号关键词" v-model="telephoneKeyWord" clearable style="margin-bottom:30px;width:200px;"></el-input>
+    <el-input placeholder="请输入用户名关键词" v-model="nameKeyWord" clearable style="margin-bottom:30px;width:200px;height:40px"></el-input>
+    <el-input placeholder="请输入手机号关键词" v-model="telephoneKeyWord" clearable style="margin-bottom:30px;width:200px;height:40px"></el-input>
     <el-button type="success" @click="searchByKeyWords" >搜索</el-button>
     <el-table style="width:100%;" :data="list" height="600">
       <el-table-column align="center" label="#">
@@ -32,7 +32,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="200px">
         <template slot-scope="scope">
-          <el-button type="primary" icon="el-icon-edit" circle></el-button>
+          <!-- <el-button type="primary" icon="el-icon-edit" circle></el-button> -->
           <el-button type="danger" icon="el-icon-delete" circle @click="deleteUser(scope.row)"></el-button>
         </template>
       </el-table-column>
@@ -69,7 +69,7 @@ export default {
   },
   created() {
     this.getList();
-    this.getCounts();
+    // this.getCounts();
   },
   methods: {
     searchByKeyWords(){
@@ -86,21 +86,21 @@ export default {
       // console.log(`当前页: ${val}`);
       this.getList();
     },
-    getCounts(){
-      var that = this;
-       axios
-        .get("/api/user/getCounts")
-        .then(function(response) {
+    // getCounts(){
+    //   var that = this;
+    //    axios
+    //     .get("/api/user/getCounts")
+    //     .then(function(response) {
 
-          // console.log(response.data)
-          var j = parseInt(response.data)
-          that.totalPage = j
-          // console.log(that.stationInfoTotal[0].names);
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    },
+    //       // console.log(response.data)
+    //       var j = parseInt(response.data)
+    //       that.totalPage = j
+    //       // console.log(that.stationInfoTotal[0].names);
+    //     })
+    //     .catch(function(error) {
+    //       console.log(error);
+    //     });
+    // },
     getList() {
       var that = this;
       var params = new URLSearchParams();
@@ -112,7 +112,8 @@ export default {
         .post("/api/user/getUserInfo",params)
         .then(function(response) {
           // console.log(response.data);
-          that.list = response.data;
+          that.list = response.data.list;
+           that.totalPage = response.data.total;
         })
         .catch(function(error) {
           console.log(error);
@@ -150,3 +151,10 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+
+</style>
+<style >
+
+</style>

@@ -25,12 +25,19 @@ export default new Router({
     },
     {
       path: '/manage',
+      meta: {
+        requireAuth: true,  // 判断是否需要登录
+      },
       component: () => import('@/pages/manage'),
       children: [
         {
           path: '/user',
           component: () => import('@/pages/user'),
         }, 
+        {
+          path: '/index',
+          component: () => import('@/pages/index'),
+        },
         {
           path: '/search',
           component: () => import('@/pages/search'),
@@ -39,9 +46,9 @@ export default new Router({
           path: '/busline',
           component: () => import('@/pages/busline'),
         },
-       
       ]
     },
     
-  ]
+  ],
+  mode:"history"
 })
