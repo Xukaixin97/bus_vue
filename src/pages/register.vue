@@ -49,9 +49,14 @@
                 auto-complete="on"
               ></el-input>
 
-              <el-button type="primary" @click="sendMsg" style="height:56.09px;">发送验证码</el-button>
+              <el-button
+                type="primary"
+                @click="sendMsg('ruleForm')"
+                :disabled="this.disabled == true"
+                style="height:56.09px;width:112px"
+              >{{statusMsg}}</el-button>
             </div>
-            <span class="status">{{statusMsg}}</span>
+            <!-- <span class="status">{{statusMsg}}</span> -->
           </el-form-item>
           <el-form-item prop="code">
             <el-input v-model="ruleForm.code" maxlength="6" placeholder="请输入验证码" name="code"/>
@@ -82,6 +87,29 @@ export default {
         callback(new Error("请输入用户名"));
       } else {
         // console.log(value)
+        var that = this;
+        var params = new URLSearchParams();
+        params.append("username", value);
+        axios
+          .post("/api/admin/checkUsernameIfExit", params)
+          .then(function(response) {
+            // var result = response.data;
+            console.log(result);
+            if (result == true) {
+              callback(new Error("用户已存在,请重新命名"));
+            } else {
+              callback();
+            }
+          })
+          .catch(error => console.log(error));
+      }
+    };
+    var validateEmailIfExit = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入邮箱"));
+      } else {
+        // console.log(value)
+        var that = this;
         var params = new URLSearchParams();
         params.append("username", value);
         axios
@@ -90,8 +118,12 @@ export default {
             var result = response.data;
             // console.log(result)
             if (result == true) {
-              callback(new Error("用户已存在,请重新命名"));
+              that.ifSendMsg = false;
+              // console.log(that.ifSendMsg)
+              callback(new Error("邮箱已经注册，请更换邮箱"));
             } else {
+              that.ifSendMsg = true;
+              // console.log(that.ifSendMsg)
               callback();
             }
           })
@@ -118,7 +150,9 @@ export default {
       }
     };
     return {
-      statusMsg: "",
+      disabled: false,
+      ifSendMsg: false,
+      statusMsg: "发送验证码",
       ruleForm: {
         username: "",
         password: "",
@@ -141,6 +175,11 @@ export default {
 
         email: [
           { required: true, message: "请输入邮箱地址", trigger: "blur" },
+
+          {
+            validator: validateEmailIfExit,
+            trigger: ["blur", "change"]
+          },
           {
             type: "email",
             message: "请输入正确的邮箱地址",
@@ -161,7 +200,7 @@ export default {
       this.$router.push("/login");
     },
     submitForm(formName) {
-      var that = this
+      var that = this;
       this.$refs[formName].validate(valid => {
         if (valid) {
           console.log(this.ruleForm);
@@ -172,16 +211,16 @@ export default {
               // console.log(result)
               if (result == true) {
                 that.$message({
-                  message:'注册成功',
-                  type:'success',
-                  duration:'1000'
-                })
-                that.$router.push({path:'/search'})
+                  message: "注册成功",
+                  type: "success",
+                  duration: "1000"
+                });
+                that.$router.push({ path: "/login" });
               } else {
                 that.$message({
-                  message:'注册失败',
-                  type:'error',
-                })
+                  message: "注册失败",
+                  type: "error"
+                });
               }
             })
             .catch(error => console.log(error));
@@ -191,21 +230,45 @@ export default {
         }
       });
     },
-    sendMsg() {
-      var params = new URLSearchParams();
-      params.append("email", this.ruleForm.email);
-      console.log(this.ruleForm.email);
-      axios
-        .post("/api/admin/sendMsg", params)
-        .then(response => {
-          this.ruleForm.code2 = response.data; //返回的验证码
-          // console.log(this.ruleForm.code2);
-          this.$message({
-            message: "验证码发送成功",
-            type: "success"
-          });
-        })
-        .catch(error => console.log("error"));
+    sendMsg(formName) {
+      var that = this;
+      console.log(that.ifSendMsg);
+      if (that.ifSendMsg) {
+        var params = new URLSearchParams();
+        params.append("email", this.ruleForm.email);
+        console.log(this.ruleForm.email);
+        axios
+          .post("/api/admin/sendMsg", params)
+          .then(response => {
+            this.ruleForm.code2 = response.data; //返回的验证码
+            // console.log(this.ruleForm.code2);
+
+            let times = 60;
+            var interval = setInterval(() => {
+              // console.log(times)
+              times--;
+              if (times == 0) {
+                that.disabled = false;
+                that.statusMsg = "发送验证码";
+                clearInterval(interval);
+              } else {
+                that.disabled = true;
+                that.statusMsg = times + "s";
+              }
+            }, 1000);
+
+            this.$message({
+              message: "验证码发送成功",
+              type: "success"
+            });
+          })
+          .catch(error => console.log("error"));
+      } else {
+        that.$message({
+          message: "邮箱错误",
+          type: "warning"
+        });
+      }
     }
   }
 };

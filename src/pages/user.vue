@@ -131,22 +131,58 @@ export default {
       var params = new URLSearchParams();
       params.append("id", id);
       // console.log(id);
-      axios
-        .post("/api/user/deleteUser", params)
-        .then(function(response) {
-          var result = response.data;
-          if (result) {
-            that.getList();
-            that.$notify.success({
-              title: 'Info',
-            message: '删除成功',
-            showClose: false
+      this.$confirm("此操作将永久删除该条信息, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          var that = this;
+          var id = row.id;
+          var params = new URLSearchParams();
+          params.append("id", id);
+          axios
+            .post("/api/user/deleteUser", params)
+            .then(function(response) {
+              var result = response.data;
+              console.log(result)
+              if (result) {
+                that.getList();
+              }
             })
-          }
+            .catch(function(error) {
+              this.$error({
+                type: "error",
+                message: "删除失败"
+              });
+            });
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
         })
-        .catch(function(error) {
-          console.log(error);
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
         });
+      // axios
+      //   .post("/api/user/deleteUser", params)
+      //   .then(function(response) {
+      //     var result = response.data;
+      //     if (result) {
+      //       that.getList();
+      //       that.$notify.success({
+      //         title: 'Info',
+      //       message: '删除成功',
+      //       showClose: false
+      //       })
+      //     }
+      //   })
+      //   .catch(function(error) {
+      //     console.log(error);
+      //   });
     }
   }
 };

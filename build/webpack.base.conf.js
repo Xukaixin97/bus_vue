@@ -35,20 +35,20 @@ module.exports = {
       //   test: /\.less$/,
       //   loader: "style-loader!css-loader!less-loader"
       // }, 
-      {
-        test: /\.svg$/,
-        include: [
-          path.resolve(__dirname, '../src/assets'),
-        ],
-        loader: 'svg-sprite?' + JSON.stringify({
-          name: '[name]',
-          prefixize: true,
-        }),
-      },
-      {
-        test: /\.scss$/,
-        loaders: ["style", "css", "sass"]
-      },
+      // {
+      //   test: /\.svg$/,
+      //   include: [
+      //     path.resolve(__dirname, '../src/assets'),
+      //   ],
+      //   loader: 'svg-sprite?' + JSON.stringify({
+      //     name: '[name]',
+      //     prefixize: true,
+      //   }),
+      // },
+      // {
+      //   test: /\.scss$/,
+      //   loaders: ["style", "css", "sass"]
+      // },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -61,9 +61,12 @@ module.exports = {
       },
       {
         test: /\.(png|jpe?g|gif)(\?.*)?$/,
-        exclude: [
-          path.resolve(__dirname, '../src/assets'),
-        ],
+        // exclude: [
+        //   path.resolve(__dirname, '../src/assets'),
+        // ],
+        // use:[{
+        //   loader:'url-loader'
+        // }]
         loader: 'url-loader',
         options: {
           limit: 10000,
@@ -82,7 +85,7 @@ module.exports = {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
         loader: 'url-loader',
         options: {
-          limit: 10000,
+          limit: 4096,
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
