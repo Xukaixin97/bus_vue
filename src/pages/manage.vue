@@ -34,7 +34,7 @@
               <el-breadcrumb-item :to="{ path: '/manage' }">首页</el-breadcrumb-item>
             </el-breadcrumb>-->
             <el-dropdown>
-              <span class="el-dropdown-link" style="font-size:16px">{{username}}</span>
+              <span class="el-dropdown-link" style="font-size:20px">{{username}}</span>
               <el-dropdown-menu slot="dropdown">
                 <!-- <el-dropdown-item command="home">首页</el-dropdown-item> -->
                 <el-dropdown-item command="signout" @click.native="exit">退出</el-dropdown-item>

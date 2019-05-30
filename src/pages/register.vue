@@ -93,7 +93,7 @@ export default {
         axios
           .post("/api/admin/checkUsernameIfExit", params)
           .then(function(response) {
-            // var result = response.data;
+            var result = response.data;
             console.log(result);
             if (result == true) {
               callback(new Error("用户已存在,请重新命名"));
@@ -256,7 +256,6 @@ export default {
                 that.statusMsg = times + "s";
               }
             }, 1000);
-
             this.$message({
               message: "验证码发送成功",
               type: "success"
